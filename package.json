@@ -10,6 +10,7 @@
   },
   "private": true,
   "dependencies": {
+    "cookie-parser": "^1.4.7",
     "express": "^5.2.1",
     "express-validator": "^7.3.2"
   },
