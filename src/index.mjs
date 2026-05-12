@@ -45,29 +45,24 @@ app.get('/', loggingMiddleware, (req, res) => {
     res.status(200).send({ msg: 'Hello World!' });
 });
 
-// app.post('/api/auth', (req, res) => {
-//     const { body: { name, password } } = req;
-//     console.log(name, password);
-//     const findUser = mockUsers.find((user) => user.name === name);
-//     if (!findUser || findUser.password !== password) return res.status(401).send('Bad credentials');
-//
-//     req.session.user = findUser;
-//     return res.status(200).send(findUser);
-// });
-
 app.get('/api/auth/status', (req, res) => {
     console.log('Inside /auth/status endpoint', req.user);
     console.log('Inside /auth/status endpoint', req.session);
+    // req.sessionStore.get(req.sessionID, (err, session) => {
+    //     console.log(session);
+    // })
 
     return req.user
         ? res.status(200).send({ authenticated: true, user: req.user })
         : res.status(401).send('Unauthorized');
-    // req.sessionStore.get(req.sessionID, (err, session) => {
-    //     console.log(session);
-    // })
-    // return req.session.user
-    //     ? res.status(200).send({ authenticated: true, user: req.session.user })
-    //     : res.status(401).send('Unauthorized');
+})
+
+app.post('/api/auth/logout', (req, res) => {
+    if (!req.user) return res.status(401).send('Unauthorized');
+    req.logout((err) => {
+        if (err) return res.sendStatus(400);
+        return res.status(200).send('Logged out successfully');
+    });
 })
 
 app.post('/api/cart', (req, res) => {
