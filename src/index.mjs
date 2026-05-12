@@ -3,6 +3,8 @@ import routes from './routes/index.mjs';
 import cookieParser from 'cookie-parser';
 import session from 'express-session';
 import { mockUsers } from "./mocks/mock-users.mjs";
+import passport from 'passport';
+import './strategies/local-strategy.mjs'
 
 export const app = express();
 
@@ -16,6 +18,9 @@ app.use(session({
         maxAge: 1000 * 60 * 60,
     }
 }));
+app.use(passport.initialize());
+app.use(passport.session());
+
 app.use(routes);
 
 const loggingMiddleware = (req, res, next) => {
@@ -25,6 +30,13 @@ const loggingMiddleware = (req, res, next) => {
 
 const PORT = process.env.PORT || 3000;
 
+app.post('/api/auth',
+    passport.authenticate('local'),
+    (req, res) => {
+        res.sendStatus(200);
+    }
+)
+
 app.get('/', loggingMiddleware, (req, res) => {
     console.log(req.session);
     console.log(req.session.id);
@@ -33,24 +45,24 @@ app.get('/', loggingMiddleware, (req, res) => {
     res.status(200).send({ msg: 'Hello World!' });
 });
 
-app.post('/api/auth', (req, res) => {
-    const { body: { name, password } } = req;
-    console.log(name, password);
-    const findUser = mockUsers.find((user) => user.name === name);
-    if (!findUser || findUser.password !== password) return res.status(401).send('Bad credentials');
-
-    req.session.user = findUser;
-    return res.status(200).send(findUser);
-});
-
 app.get('/api/auth/status', (req, res) => {
-    console.log(req.session.user);
-    req.sessionStore.get(req.sessionID, (err, session) => {
-        console.log(session);
-    })
-    return req.session.user
-        ? res.status(200).send({ authenticated: true, user: req.session.user })
+    console.log('Inside /auth/status endpoint', req.user);
+    console.log('Inside /auth/status endpoint', req.session);
+    // req.sessionStore.get(req.sessionID, (err, session) => {
+    //     console.log(session);
+    // })
+
+    return req.user
+        ? res.status(200).send({ authenticated: true, user: req.user })
         : res.status(401).send('Unauthorized');
+})
+
+app.post('/api/auth/logout', (req, res) => {
+    if (!req.user) return res.status(401).send('Unauthorized');
+    req.logout((err) => {
+        if (err) return res.sendStatus(400);
+        return res.status(200).send('Logged out successfully');
+    });
 })
 
 app.post('/api/cart', (req, res) => {
