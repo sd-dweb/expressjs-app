@@ -2,11 +2,15 @@ import express from 'express';
 import routes from './routes/index.mjs';
 import cookieParser from 'cookie-parser';
 import session from 'express-session';
-import { mockUsers } from "./mocks/mock-users.mjs";
 import passport from 'passport';
+import mongoose from 'mongoose';
 import './strategies/local-strategy.mjs'
 
 export const app = express();
+
+mongoose.connect('mongodb://localhost:27017/express_db')
+    .then(() => console.log('Connected to MongoDB'))
+    .catch(err => console.log('Error', err));
 
 app.use(express.json());
 app.use(cookieParser('secret'));

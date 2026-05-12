@@ -3,6 +3,7 @@ import { query, validationResult, checkSchema, matchedData } from "express-valid
 import { mockUsers } from '../mocks/mock-users.mjs';
 import { createUserValidationSchema } from '../utils/validationSchemas.mjs';
 import { resolveIndexById } from '../utils/middlewares.mjs';
+import { User } from '../schemas/user.mjs';
 
 const router = Router();
 
@@ -23,7 +24,8 @@ router.get('/api/users',
         )
 
         return res.send(mockUsers);
-    });
+    }
+);
 
 router.get('/api/users/:id', resolveIndexById, (req, res) => {
     const { findUserIndex } = req;
@@ -37,18 +39,20 @@ router.get('/api/users/:id', resolveIndexById, (req, res) => {
 
 router.post('/api/users',
     checkSchema(createUserValidationSchema),
-    (req, res) => {
+    async (req, res) => {
         const result = validationResult(req);
-
         if(!result.isEmpty())
             return res.status(400).send({ errors: result.array() });
-
         const data = matchedData(req);
+        const newUser = new User(data);
 
-        const newUser = { id: mockUsers[mockUsers.length - 1].id + 1, ...data };
-        mockUsers.push(newUser);
-
-        return res.status(201).send(newUser);
+        try {
+            const savedUser = await newUser.save();
+            return res.status(201).send(savedUser);
+        } catch (error) {
+            console.error(error);
+            return res.status(400);
+        }
     });
 
 router.put('/api/users/:id',  resolveIndexById, (req, res) => {
