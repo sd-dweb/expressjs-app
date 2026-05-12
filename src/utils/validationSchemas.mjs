@@ -1,5 +1,5 @@
 export const createUserValidationSchema = {
-    username: {
+    name: {
         isLength: {
             options: {
                 min: 3,
@@ -15,7 +15,10 @@ export const createUserValidationSchema = {
             errorMessage: "Username must be a string!",
         },
     },
-    displayName: {
+    email: {
         notEmpty: true,
     },
+    password: {
+        notEmpty: true,
+    }
 };

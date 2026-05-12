@@ -1,19 +1,24 @@
 import passport from 'passport';
 import { Strategy } from 'passport-local';
-import { mockUsers } from '../mocks/mock-users.mjs';
+import { User } from '../schemas/user.mjs';
+import { comparePassword } from "../utils/helper.mjs";
 
 // Configure the local strategy with usernameField option
 export default passport.use(
     new Strategy(
         { usernameField: 'name' },  // Map 'name' field to username
-        (name, password, done) => {
+        async (name, password, done) => {
             console.log('Username: ', name, 'Password: ', password);
 
-            const findUser = mockUsers.find((user) => user.name === name);
-            if (!findUser || findUser.password !== password) {
-                return done(null, false, { message: 'Bad credentials' });
+            try {
+                const findUser = await User.findOne({ name });
+                if (!findUser || !comparePassword(password, findUser.password)) {
+                    return done(null, false, { message: 'Incorrect username or password.' });
+                }
+                return done(null, findUser);
+            } catch (e) {
+
             }
-            return done(null, findUser);
         }
     )
 );
@@ -25,12 +30,16 @@ passport.serializeUser((user, done) => {
 });
 
 // Deserialize user from session
-passport.deserializeUser((id, done) => {
+passport.deserializeUser(async (id, done) => {
     console.log('Deserializing user:', id);
-    const findUser = mockUsers.find((user) => user.id === id);
-    if (!findUser) {
-        return done(new Error('User not found'), null);
-    }
+    const findUser = await User.findById(id);
     console.log('Deserializing user:', findUser);
-    done(null, findUser);
+    try {
+        if (!findUser) {
+            new Error('User not found');
+        }
+        done(null, findUser);
+    } catch (err) {
+        done(err, null);
+    }
 });
