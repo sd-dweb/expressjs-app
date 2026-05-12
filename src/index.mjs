@@ -53,6 +53,25 @@ app.get('/api/auth/status', (req, res) => {
         : res.status(401).send('Unauthorized');
 })
 
+app.post('/api/cart', (req, res) => {
+    if (!req.session.user) return res.status(401).send('Bad credentials');
+    const { body: item } = req;
+    const { cart } = req.session;
+
+    if (cart) {
+        cart.push(item);
+    } else {
+        req.session.cart = [item];
+    }
+
+    return res.status(201).send(item);
+})
+
+app.get('/api/cart', (req, res) => {
+    if (!req.session.user) return res.status(401).send('Bad credentials');
+    res.status(200).send(req.session.cart ?? []);
+})
+
 app.listen(PORT, () => {
   console.log(`Server is running on port ${PORT}`);
 });
