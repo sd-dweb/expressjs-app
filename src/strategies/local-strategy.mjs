@@ -1,7 +1,7 @@
 import passport from 'passport';
 import { Strategy } from 'passport-local';
-import { mockUsers } from '../mocks/mock-users.mjs';
 import { User } from '../schemas/user.mjs';
+import { comparePassword } from "../utils/helper.mjs";
 
 // Configure the local strategy with usernameField option
 export default passport.use(
@@ -12,7 +12,7 @@ export default passport.use(
 
             try {
                 const findUser = await User.findOne({ name });
-                if (!findUser || findUser.password !== password) {
+                if (!findUser || !comparePassword(password, findUser.password)) {
                     return done(null, false, { message: 'Incorrect username or password.' });
                 }
                 return done(null, findUser);

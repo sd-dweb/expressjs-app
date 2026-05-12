@@ -4,6 +4,7 @@ import { mockUsers } from '../mocks/mock-users.mjs';
 import { createUserValidationSchema } from '../utils/validationSchemas.mjs';
 import { resolveIndexById } from '../utils/middlewares.mjs';
 import { User } from '../schemas/user.mjs';
+import { hashedPassword } from "../utils/helper.mjs";
 
 const router = Router();
 
@@ -44,6 +45,7 @@ router.post('/api/users',
         if(!result.isEmpty())
             return res.status(400).send({ errors: result.array() });
         const data = matchedData(req);
+        data.password = hashedPassword(data.password);
         const newUser = new User(data);
 
         try {
