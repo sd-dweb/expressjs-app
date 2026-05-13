@@ -5,6 +5,7 @@ import session from 'express-session';
 import passport from 'passport';
 import mongoose from 'mongoose';
 import './strategies/local-strategy.mjs'
+import MongoStore from 'connect-mongo';
 
 export const app = express();
 
@@ -20,7 +21,10 @@ app.use(session({
     resave: false,
     cookie: {
         maxAge: 1000 * 60 * 60,
-    }
+    },
+    store: MongoStore.create({
+        client: mongoose.connection.getClient()
+    })
 }));
 app.use(passport.initialize());
 app.use(passport.session());
@@ -52,6 +56,7 @@ app.get('/', loggingMiddleware, (req, res) => {
 app.get('/api/auth/status', (req, res) => {
     console.log('Inside /auth/status endpoint', req.user);
     console.log('Inside /auth/status endpoint', req.session);
+    console.log('SessionID: ', req.session.id);
     // req.sessionStore.get(req.sessionID, (err, session) => {
     //     console.log(session);
     // })
