@@ -6,9 +6,9 @@ export default {
   collectCoverageFrom: [
     'src/**/*.mjs',
     '!src/index.mjs',
-    '!src/mocks/**'
+    '!src/mocks/**',
   ],
   coverageDirectory: 'coverage',
-  verbose: true
+  verbose: true,
 };
 

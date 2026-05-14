@@ -1,3 +1,4 @@
+import { describe, test, expect } from '@jest/globals';
 import { hashedPassword, comparePassword } from '../helper.mjs';
 
 describe('hashedPassword', () => {
