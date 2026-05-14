@@ -1,10 +1,12 @@
+import 'dotenv/config';
 import express from 'express';
 import routes from './routes/index.mjs';
 import cookieParser from 'cookie-parser';
 import session from 'express-session';
 import passport from 'passport';
+// import './strategies/local-strategy.mjs'
+import './strategies/google-strategy.mjs';
 import mongoose from 'mongoose';
-import './strategies/local-strategy.mjs'
 import MongoStore from 'connect-mongo';
 
 export const app = express();
@@ -91,6 +93,16 @@ app.post('/api/cart', (req, res) => {
 app.get('/api/cart', (req, res) => {
     if (!req.session.user) return res.status(401).send('Bad credentials');
     res.status(200).send(req.session.cart ?? []);
+})
+
+app.get('/api/auth/google', passport.authenticate('google'), (req, res) => {
+
+})
+
+app.get('/api/auth/google/redirect', passport.authenticate('google'), (req, res) => {
+    console.log('req.session: ', req.session);
+    console.log('req.user', req.user);
+    res.status(200).send('Google authentication successful');
 })
 
 app.listen(PORT, () => {
