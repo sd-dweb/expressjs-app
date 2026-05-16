@@ -1,16 +1,25 @@
 import request from 'supertest';
-import express from 'express';
+import { createApp } from "../createApp.mjs";
+import mongoose from "mongoose";
 
-const app = express();
+describe('api/auth/status', () => {
+    let app;
 
-app.get('/hello', (req, res) => res.sendStatus(200));
+    beforeAll(async () => {
+        await mongoose.connect('mongodb://localhost:27017/express_db_test')
+            .then(() => console.log('Connected to MongoDB'))
+            .catch((err) => console.log(err));
 
-describe('Home page', () => {
-    it('get hello endpoint expect 200', async () => {
-        const res = await request(app)
-            .get('/hello')
-            .expect(200);
+        app = createApp();
+    })
 
-        expect(res.statusCode).toBe(200);
+    it('should return 401 when not logged in', async () => {
+        const res = await request(app).get('/api/auth/status');
+        expect(res.statusCode).toBe(401);
+    })
+
+    afterAll(async () => {
+        await mongoose.connection.dropDatabase();
+        await mongoose.connection.close();
     })
 })
