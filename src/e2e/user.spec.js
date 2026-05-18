@@ -20,14 +20,22 @@ describe('api/auth/status', () => {
     expect(res.statusCode).toBe(201);
   });
 
-  it('should log the user information', async () => {
-      const response = await request(app).post('/api/auth/').send({ name: 'John Doe', password: '123456' });
+  it('should log the user information and visit /api/auth/status and return authenticated user', async () => {
+    const response = await request(app).post('/api/auth/')
+      .send({ name: 'John Doe', password: '123456' })
+      .then((res) => {
+        return request(app)
+          .get('/api/auth/status')
+          .set('Cookie', res.header['set-cookie']);
+      });
 
-      expect(response.statusCode).toBe(200);
-  })
+    expect(response.statusCode).toBe(200);
+    expect(response.body.user.name).toBe('John Doe');
+    expect(response.body.user.email).toBe('some@email.com');
+  });
 
   afterAll(async () => {
-   await mongoose.connection.dropDatabase();
-   await mongoose.connection.close();
+    await mongoose.connection.dropDatabase();
+    await mongoose.connection.close();
   });
 });

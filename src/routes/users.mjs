@@ -1,10 +1,8 @@
-import { response, Router } from 'express';
-import { query, validationResult, checkSchema, matchedData } from 'express-validator';
+import { Router } from 'express';
+import { query, checkSchema } from 'express-validator';
 import { mockUsers } from '../mocks/mock-users.mjs';
 import { createUserValidationSchema } from '../utils/validationSchemas.mjs';
 import { resolveIndexById } from '../utils/middlewares.mjs';
-import { User } from '../schemas/user.mjs';
-import { hashedPassword } from '../utils/helper.mjs';
 import { createUserHandler } from '../handlers/users.mjs';
 
 const router = Router();
