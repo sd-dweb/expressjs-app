@@ -1,8 +1,8 @@
 export default {
   testEnvironment: 'node',
   transform: {},
-  moduleFileExtensions: ['js', 'mjs'],
-  testMatch: ['**/__tests__/**/*.mjs', '**/?(*.)+(spec|test).mjs'],
+  moduleFileExtensions: ['js', 'mjs', 'cjs'],
+  testMatch: ['**/__tests__/**/*.{js,mjs}', '**/?(*.)+(spec|test).{js,mjs}'],
   collectCoverageFrom: [
     'src/**/*.mjs',
     '!src/index.mjs',
