@@ -1,6 +1,6 @@
 import 'dotenv/config';
 import mongoose from 'mongoose';
-import { createApp } from "./createApp.mjs";
+import { createApp } from './createApp.mjs';
 
 const PORT = process.env.PORT || 3000;
 

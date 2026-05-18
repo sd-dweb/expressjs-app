@@ -1,10 +1,11 @@
-import { Router } from 'express';
+import { response, Router } from 'express';
 import { query, validationResult, checkSchema, matchedData } from 'express-validator';
 import { mockUsers } from '../mocks/mock-users.mjs';
 import { createUserValidationSchema } from '../utils/validationSchemas.mjs';
 import { resolveIndexById } from '../utils/middlewares.mjs';
 import { User } from '../schemas/user.mjs';
 import { hashedPassword } from '../utils/helper.mjs';
+import { createUserHandler } from '../handlers/users.mjs';
 
 const router = Router();
 
@@ -39,22 +40,8 @@ router.get('/api/users/:id', resolveIndexById, (req, res) => {
 
 router.post('/api/users',
   checkSchema(createUserValidationSchema),
-  async (req, res) => {
-    const result = validationResult(req);
-    if(!result.isEmpty())
-      return res.status(400).send({ errors: result.array() });
-    const data = matchedData(req);
-    data.password = hashedPassword(data.password);
-    const newUser = new User(data);
-
-    try {
-      const savedUser = await newUser.save();
-      return res.status(201).send(savedUser);
-    } catch (error) {
-      console.error(error);
-      return res.status(400);
-    }
-  });
+  createUserHandler,
+);
 
 router.put('/api/users/:id',  resolveIndexById, (req, res) => {
   const { body, findUserIndex } = req;
