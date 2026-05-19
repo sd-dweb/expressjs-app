@@ -7,9 +7,18 @@ import './strategies/local-strategy.mjs';
 import mongoose from 'mongoose';
 import MongoStore from 'connect-mongo';
 import express from 'express';
+import cors from 'cors';
+import swaggerUi from 'swagger-ui-express';
+import { swaggerSpec } from './swagger.mjs';
 
 export function createApp() {
   const app = express();
+
+  // CORS
+  app.use(cors({ origin: 'http://localhost:4200' }));
+
+  // Swagger UI
+  app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec));
 
   app.use(express.json());
   app.use(cookieParser('secret'));
