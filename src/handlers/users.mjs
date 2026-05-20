@@ -20,6 +20,11 @@ export const createUserHandler = async (request, response) => {
     const savedUser = await newUser.save();
     return response.status(201).send(savedUser);
   } catch (err) {
-    return response.sendStatus(400);
+    if (err.code === 11000) {
+      const field = Object.keys(err.keyValue)[0];
+      return response.status(409).send({ msg: `${field} already exists` });
+    }
+    console.error('Create user error:', err.message);
+    return response.status(400).send({ msg: err.message });
   }
 };

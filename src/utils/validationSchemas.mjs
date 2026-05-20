@@ -21,4 +21,12 @@ export const createUserValidationSchema = {
   password: {
     notEmpty: true,
   },
+  role: {
+    notEmpty: true,
+    isString: true,
+    isIn: {
+      options: [['admin', 'moderator', 'user']],
+      errorMessage: 'Role must be either admin, moderator, or user',
+    },
+  }
 };
