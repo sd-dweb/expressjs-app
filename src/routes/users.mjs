@@ -58,12 +58,13 @@ router.put('/api/users/:id',  resolveIndexById, (req, res) => {
   return res.status(200).send(mockUsers[findUserIndex]);
 });
 
-router.patch('/api/users/:id', resolveIndexById, (req, res) => {
-  const { body, findUserIndex } = req;
+router.patch('/api/users/:id', async (req, res) => {
+  const { params: { id }, body } = req;
 
-  mockUsers[findUserIndex] = { ...mockUsers[findUserIndex], ...body };
+  const updatedUser = await User.findByIdAndUpdate(id, body, { new: true });
+  if (!updatedUser) return res.status(404).send({ msg: 'User not found!' });
 
-  return res.status(200).send(mockUsers[findUserIndex]);
+  return res.status(200).send(updatedUser);
 });
 
 router.delete('/api/users/:id', async (req, res) => {
