@@ -26,14 +26,15 @@ router.get('/api/users',
   },
 );
 
-router.get('/api/users/:id', resolveIndexById, (req, res) => {
-  const { findUserIndex } = req;
-  const findUser = mockUsers[findUserIndex];
-  if (!findUser) {
+router.get('/api/users/:id', async (req, res) => {
+  const { params: { id } } = req;
+
+  const user = await User.findById(id);
+  if (!user) {
     return res.status(404).send({ msg: 'User not found!' });
   }
 
-  return res.status(200).send(findUser);
+  return res.status(200).send(user);
 });
 
 router.post('/api/users',
