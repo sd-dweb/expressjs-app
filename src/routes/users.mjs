@@ -1,9 +1,7 @@
 import { Router } from 'express';
 import { query, checkSchema } from 'express-validator';
-import { mockUsers } from '../mocks/mock-users.mjs';
 import { User } from '../schemas/user.mjs';
 import { createUserValidationSchema } from '../utils/validationSchemas.mjs';
-import { resolveIndexById } from '../utils/middlewares.mjs';
 import { createUserHandler } from '../handlers/users.mjs';
 
 const router = Router();
@@ -42,20 +40,13 @@ router.post('/api/users',
   createUserHandler,
 );
 
-router.put('/api/users/:id',  resolveIndexById, (req, res) => {
-  const { body, findUserIndex } = req;
+router.put('/api/users/:id', async (req, res) => {
+  const { params: { id }, body } = req;
 
-  mockUsers[findUserIndex] = { id: mockUsers[findUserIndex].id, ...body };
+  const updatedUser = await User.findByIdAndUpdate(id, body, { new: true, overwrite: true });
+  if (!updatedUser) return res.status(404).send({ msg: 'User not found!' });
 
-  return res.status(200).send(mockUsers[findUserIndex]);
-});
-
-router.put('/api/users/:id',  resolveIndexById, (req, res) => {
-  const { body, findUserIndex } = req;
-
-  mockUsers[findUserIndex] = { id: mockUsers[findUserIndex].id, ...body };
-
-  return res.status(200).send(mockUsers[findUserIndex]);
+  return res.status(200).send(updatedUser);
 });
 
 router.patch('/api/users/:id', async (req, res) => {
