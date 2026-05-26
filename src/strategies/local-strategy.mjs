@@ -8,10 +8,9 @@ export default passport.use(
   new Strategy(
     { usernameField: 'name' },  // Map 'name' field to username
     async (name, password, done) => {
-      console.log('Username: ', name, 'Password: ', password);
-
       try {
         const findUser = await User.findOne({ name });
+
         if (!findUser || !comparePassword(password, findUser.password)) {
           return done(null, false, { message: 'Incorrect username or password.' });
         }

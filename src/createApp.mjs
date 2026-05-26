@@ -46,7 +46,7 @@ export function createApp() {
   app.post('/api/auth',
     passport.authenticate('local'),
     (req, res) => {
-      res.sendStatus(200);
+      res.status(200).send({ name: req.user.name, email: req.user.email, role: req.user.role });
     },
   );
 

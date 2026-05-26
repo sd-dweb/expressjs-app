@@ -28,5 +28,5 @@ export const createUserValidationSchema = {
       options: [['admin', 'moderator', 'user']],
       errorMessage: 'Role must be either admin, moderator, or user',
     },
-  }
+  },
 };
